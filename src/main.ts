@@ -4,6 +4,20 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors(); // Giúp Next.js có thể gọi API nếu cần
-  await app.listen(process.env.PORT ?? 3001); // Đổi thành 3001 để tránh trùng với Next.js (3000)
+  
+  if (process.env.VERCEL) {
+    await app.init();
+    return app.getHttpAdapter().getInstance();
+  }
+  
+  await app.listen(process.env.PORT ?? 3001);
 }
-bootstrap();
+
+// Hàm Wrapper đặc biệt cho môi trường Serverless của Vercel
+let cachedServer: any;
+export default async function (req: any, res: any) {
+  if (!cachedServer) {
+    cachedServer = await bootstrap();
+  }
+  return cachedServer(req, res);
+}
