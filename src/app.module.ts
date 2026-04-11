@@ -10,6 +10,7 @@ import { PropertiesModule } from './properties/properties.module';
 import { BlogsModule } from './blogs/blogs.module';
 import { ProjectsModule } from './projects/projects.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { LocationsModule } from './locations/locations.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     BlogsModule,
     ProjectsModule,
     CloudinaryModule,
+    LocationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

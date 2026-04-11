@@ -45,4 +45,30 @@ export class ProjectsService {
       throw error;
     }
   }
+
+  async findAll(): Promise<any[]> {
+    const supabase = this.supabaseService.getClient();
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*, location:locations(*), amenities:project_amenities(*), floorplans:project_floorplans(*)');
+    if (error) {
+      this.logger.error('Error fetching projects:', error.message);
+      return [];
+    }
+    return data || [];
+  }
+
+  async findBySlug(slug: string): Promise<any | null> {
+    const supabase = this.supabaseService.getClient();
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*, location:locations(*), amenities:project_amenities(*), floorplans:project_floorplans(*)')
+      .eq('slug', slug)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      throw new Error(error.message);
+    }
+    return data || null;
+  }
 }

@@ -1,5 +1,41 @@
-import { Field, ObjectType } from '@nestjs/graphql';
-import GraphQLJSON from 'graphql-type-json';
+import { Field, ObjectType, Int } from '@nestjs/graphql';
+import { Location } from '../../locations/models/location.model';
+
+@ObjectType()
+export class ProjectAmenity {
+  @Field()
+  id: string;
+
+  @Field()
+  title: string;
+
+  @Field({ nullable: true })
+  description?: string;
+
+  @Field({ nullable: true })
+  image_url?: string;
+}
+
+@ObjectType()
+export class ProjectFloorplan {
+  @Field()
+  id: string;
+
+  @Field()
+  name: string;
+
+  @Field({ nullable: true })
+  area?: string;
+
+  @Field(() => Int, { nullable: true })
+  beds?: number;
+
+  @Field(() => Int, { nullable: true })
+  baths?: number;
+
+  @Field({ nullable: true })
+  image_url?: string;
+}
 
 @ObjectType()
 export class Project {
@@ -12,28 +48,28 @@ export class Project {
   @Field()
   name: string;
 
-  // We use GraphQLJSON so the frontend can receive the nested structures exactly as Sanity provides them.
-  @Field(() => GraphQLJSON, { nullable: true })
-  hero_data?: any;
+  @Field({ nullable: true })
+  hero_title?: string;
 
-  @Field(() => GraphQLJSON, { nullable: true })
-  overview_data?: any;
+  @Field({ nullable: true })
+  hero_desc?: string;
 
-  @Field(() => GraphQLJSON, { nullable: true })
-  values_data?: any;
+  @Field({ nullable: true })
+  hero_img?: string;
 
-  @Field(() => GraphQLJSON, { nullable: true })
-  location_data?: any;
+  @Field({ nullable: true })
+  overview_title?: string;
 
-  @Field(() => GraphQLJSON, { nullable: true })
-  architecture_data?: any;
+  @Field({ nullable: true })
+  overview_desc?: string;
 
-  @Field(() => GraphQLJSON, { nullable: true })
-  amenities_data?: any;
+  // Xoá JSONB cũ, Dùng thẳng Relationship Relational Database 
+  @Field(() => Location, { nullable: true })
+  location?: Location;
 
-  @Field(() => GraphQLJSON, { nullable: true })
-  floorplans_data?: any;
+  @Field(() => [ProjectAmenity], { nullable: true, defaultValue: [] })
+  amenities?: ProjectAmenity[];
 
-  @Field(() => GraphQLJSON, { nullable: true })
-  services_data?: any;
+  @Field(() => [ProjectFloorplan], { nullable: true, defaultValue: [] })
+  floorplans?: ProjectFloorplan[];
 }
