@@ -17,7 +17,8 @@ import { ProjectsModule } from './projects/projects.module';
       driver: ApolloDriver,
       autoSchemaFile: process.env.VERCEL ? true : join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
-      playground: true, // Enable playground locally
+      playground: true, // Hiển thị giao diện Playground
+      introspection: true, // CHo phép Playground tải Schema Docs ở Production
     }),
     SupabaseModule,
     PropertiesModule,
