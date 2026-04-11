@@ -7,15 +7,7 @@ export class ProjectsController {
   private readonly logger = new Logger(ProjectsController.name);
   private sanity: any;
 
-  constructor(private readonly projectsService: ProjectsService) {
-    this.sanity = createClient({
-      projectId: process.env.SANITY_PROJECT_ID,
-      dataset: process.env.SANITY_DATASET || 'production',
-      token: process.env.SANITY_TOKEN,
-      useCdn: false,
-      apiVersion: '2024-04-11',
-    });
-  }
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @Post()
   async handleWebhook(@Body() payload: any) {
@@ -23,6 +15,14 @@ export class ProjectsController {
     if (!payload._id) return { success: false, msg: 'No ID' };
 
     try {
+      const sanityClient = createClient({
+        projectId: process.env.SANITY_PROJECT_ID || 'missing',
+        dataset: process.env.SANITY_DATASET || 'production',
+        token: process.env.SANITY_TOKEN,
+        useCdn: false,
+        apiVersion: '2024-04-11',
+      });
+
       // Dùng GROQ Query lấy dữ liệu con (References) đã nở toàn bộ
       const groqQuery = `*[_id == $id][0]{
         ...,
@@ -31,7 +31,7 @@ export class ProjectsController {
         floorplans_ref[]->
       }`;
       const expandedParams = { id: payload._id };
-      const expandedDoc = await this.sanity.fetch(groqQuery, expandedParams);
+      const expandedDoc = await sanityClient.fetch(groqQuery, expandedParams);
 
       if (!expandedDoc) return { success: false, msg: 'Doc Not Found via GROQ' };
 
