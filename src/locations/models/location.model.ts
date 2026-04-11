@@ -13,4 +13,10 @@ export class Location {
 
   @Field({ nullable: true })
   hero_image?: string;
+
+  @Field(() => Number, { nullable: true })
+  lat?: number;
+
+  @Field(() => Number, { nullable: true })
+  lng?: number;
 }

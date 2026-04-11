@@ -59,6 +59,8 @@ async function seed() {
       id: locRes._id,
       slug: newLocation.slug.current,
       name: newLocation.name,
+      lat: 15.8794,
+      lng: 108.3350
     });
     console.log(`✅ Đã tạo Khu Vực: ${newLocation.name}`);
 
@@ -110,6 +112,8 @@ async function seed() {
       name: newProject.name,
       hero_title: 'THƯỢNG LƯU',
       hero_desc: 'Mang linh hồn phố cổ vào từng phiến đá ong.',
+      lat: 15.8800,
+      lng: 108.3360
     });
     console.log(`✅ Đã tạo Dự án chính: ${newProject.name}`);
 

@@ -63,6 +63,12 @@ export class Project {
   @Field({ nullable: true })
   overview_desc?: string;
 
+  @Field(() => Number, { nullable: true })
+  lat?: number;
+
+  @Field(() => Number, { nullable: true })
+  lng?: number;
+
   // Xoá JSONB cũ, Dùng thẳng Relationship Relational Database 
   @Field(() => Location, { nullable: true })
   location?: Location;
