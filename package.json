@@ -29,6 +29,7 @@
     "@nestjs/platform-express": "^10.0.0",
     "@sanity/client": "^7.20.0",
     "@supabase/supabase-js": "^2.103.0",
+    "@upstash/redis": "^1.37.0",
     "axios": "^1.15.0",
     "cloudinary": "^2.9.0",
     "graphql": "^16.13.2",

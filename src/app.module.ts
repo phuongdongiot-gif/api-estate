@@ -12,6 +12,8 @@ import { ProjectsModule } from './projects/projects.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { LocationsModule } from './locations/locations.module';
 
+import { UpstashRedisCache } from './upstash.cache';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -21,6 +23,7 @@ import { LocationsModule } from './locations/locations.module';
       sortSchema: true,
       playground: true, // Hiển thị giao diện Playground
       introspection: true, // CHo phép Playground tải Schema Docs ở Production
+      cache: new UpstashRedisCache(), // Thêm dòng này để kết nối Upstash
     }),
     SupabaseModule,
     PropertiesModule,
