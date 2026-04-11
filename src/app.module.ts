@@ -15,7 +15,7 @@ import { ProjectsModule } from './projects/projects.module';
     ConfigModule.forRoot({ isGlobal: true }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      autoSchemaFile: process.env.VERCEL ? true : join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
       playground: true, // Enable playground locally
     }),
