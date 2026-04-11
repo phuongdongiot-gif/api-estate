@@ -1,0 +1,64 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Blog {
+  content: JSON
+  date: DateTime
+  description: String
+  id: String!
+  img_url: String
+  slug: String!
+  title: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type Project {
+  amenities_data: JSON
+  architecture_data: JSON
+  floorplans_data: JSON
+  hero_data: JSON
+  id: String!
+  location_data: JSON
+  name: String!
+  overview_data: JSON
+  services_data: JSON
+  slug: String!
+  values_data: JSON
+}
+
+type Property {
+  area: String
+  area_num: Float
+  baths: Int
+  beds: Int
+  description: String
+  gallery: [String!]
+  id: String!
+  img_url: String
+  is_new: Boolean
+  location: String
+  name: String!
+  price: String
+  price_num: Float
+  property_category: String
+  transaction_type: String
+}
+
+type Query {
+  blog(slug: String!): Blog
+  blogs: [Blog!]!
+  project(slug: String!): Project
+  projects: [Project!]!
+  properties: [Property!]!
+  property(id: String!): Property
+}
