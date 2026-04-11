@@ -10,13 +10,17 @@ export class LocationsService {
   private sanity: any;
 
   constructor(private readonly supabaseService: SupabaseService) {
-    this.sanity = createClient({
-      projectId: process.env.SANITY_PROJECT_ID,
-      dataset: process.env.SANITY_DATASET || 'production',
-      token: process.env.SANITY_TOKEN,
-      useCdn: false,
-      apiVersion: '2024-04-11',
-    });
+    if (process.env.SANITY_PROJECT_ID) {
+      this.sanity = createClient({
+        projectId: process.env.SANITY_PROJECT_ID,
+        dataset: process.env.SANITY_DATASET || 'production',
+        token: process.env.SANITY_TOKEN,
+        useCdn: false,
+        apiVersion: '2024-04-11',
+      });
+    } else {
+      this.logger.warn('SANITY_PROJECT_ID is missing. Sanity functions will be gracefully disabled.');
+    }
   }
 
   async findAll(): Promise<Location[]> {
@@ -37,6 +41,10 @@ export class LocationsService {
       const response = await axios.get('https://provinces.open-api.vn/api/?depth=1');
       const provinces = response.data;
       const supabase = this.supabaseService.getClient();
+
+      if (!this.sanity) {
+        throw new Error('Hệ thống SanityCMS chưa được cấu hình (thiếu SANITY_PROJECT_ID). Vui lòng thêm biến môi trường!');
+      }
 
       let count = 0;
       for (const province of provinces) {
