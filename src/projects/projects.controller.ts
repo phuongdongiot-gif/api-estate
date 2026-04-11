@@ -1,36 +1,60 @@
 import { Controller, Post, Body, Logger } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
+import { createClient } from '@sanity/client';
 
 @Controller('webhook/projects')
 export class ProjectsController {
   private readonly logger = new Logger(ProjectsController.name);
+  private sanity: any;
 
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(private readonly projectsService: ProjectsService) {
+    this.sanity = createClient({
+      projectId: process.env.SANITY_PROJECT_ID,
+      dataset: process.env.SANITY_DATASET || 'production',
+      token: process.env.SANITY_TOKEN,
+      useCdn: false,
+      apiVersion: '2024-04-11',
+    });
+  }
 
   @Post()
   async handleWebhook(@Body() payload: any) {
-    this.logger.log(`Received Sanity webhook for Project: ${payload._id}`);
-
-    // Map Sanity JSON objects perfectly to Supabase JSONB columns
-    const projectData = {
-      id: payload._id, 
-      slug: payload.slug?.current || payload.slug,
-      name: payload.name,
-      hero_data: payload.hero_data || null,
-      overview_data: payload.overview_data || null,
-      values_data: payload.values_data || null,
-      location_data: payload.location_data || null,
-      architecture_data: payload.architecture_data || null,
-      amenities_data: payload.amenities_data || null,
-      floorplans_data: payload.floorplans_data || null,
-      services_data: payload.services_data || null,
-    };
+    this.logger.log(`Received Webhook for Project: ${payload._id}`);
+    if (!payload._id) return { success: false, msg: 'No ID' };
 
     try {
-      const data = await this.projectsService.upsertProject(projectData);
-      this.logger.log('Successfully synced project data to Supabase');
-      return { success: true, data };
+      // Dùng GROQ Query lấy dữ liệu con (References) đã nở toàn bộ
+      const groqQuery = `*[_id == $id][0]{
+        ...,
+        location->,
+        amenities_ref[]->,
+        floorplans_ref[]->
+      }`;
+      const expandedParams = { id: payload._id };
+      const expandedDoc = await this.sanity.fetch(groqQuery, expandedParams);
+
+      if (!expandedDoc) return { success: false, msg: 'Doc Not Found via GROQ' };
+
+      // Chế biến Project lõi
+      const projectData = {
+        id: expandedDoc._id, 
+        slug: expandedDoc.slug?.current || expandedDoc.slug,
+        location_id: expandedDoc.location?._id || null,
+        name: expandedDoc.name,
+        hero_title: expandedDoc.hero_data?.titleLine1,
+        hero_desc: expandedDoc.hero_data?.description,
+      };
+
+      const amenities = expandedDoc.amenities_ref || [];
+      const floorplans = expandedDoc.floorplans_ref || [];
+
+      // Phân tán vào Supabase
+      const result = await this.projectsService.upsertCompleteProject(projectData, amenities, floorplans);
+      
+      this.logger.log(`✅ Synced Project, ${amenities.length} amenities, ${floorplans.length} floorplans to Supabase`);
+      return { success: true, result };
     } catch (error: any) {
+      this.logger.error('Webhook Error: ' + error.message);
       return { success: false, error: error.message };
     }
   }

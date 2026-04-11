@@ -9,6 +9,7 @@ import { SupabaseModule } from './supabase/supabase.module';
 import { PropertiesModule } from './properties/properties.module';
 import { BlogsModule } from './blogs/blogs.module';
 import { ProjectsModule } from './projects/projects.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ProjectsModule } from './projects/projects.module';
     PropertiesModule,
     BlogsModule,
     ProjectsModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
