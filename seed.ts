@@ -110,8 +110,7 @@ async function seed() {
       slug: newProject.slug.current,
       location_id: locRes._id,
       name: newProject.name,
-      hero_title: 'THƯỢNG LƯU',
-      hero_desc: 'Mang linh hồn phố cổ vào từng phiến đá ong.',
+      hero_data: newProject.hero_data,
       lat: 15.8800,
       lng: 108.3360
     });
@@ -127,14 +126,60 @@ async function seed() {
 
     await supabase.from('project_floorplans').upsert({
         id: fpRes._id,
-        project_id: projRes._id, // Ràng buộc FK với Project
+        project_id: projRes._id, 
         name: newFloorplan.name,
         area: newFloorplan.area,
         beds: newFloorplan.beds,
         baths: newFloorplan.baths
     });
 
-    console.log('🚀 KIỂM TRA ĐẦU CUỐI HOÀN HẢO! CHUỖI LIÊN KẾT ĐÃ THÀNH CÔNG VÀO CẢ 5 BẢNG.');
+    // 5. TẠO CÁC CĂN HỘ/BẤT ĐỘNG SẢN BÁN LẺ (PROPERTIES) ĐỂ SHOW LÊN TRANG CHỦ
+    console.log('🏘️ 5. Tạo các Listing Bất Động Sản Bán Lẻ...');
+    const propertiesToSeed = [
+      {
+        id: 'prop-real-1',
+        transaction_type: 'sale',
+        property_category: 'apartments',
+        is_new: true,
+        name: 'Penthouse View Biển Mỹ Khê',
+        project_id: projRes._id,
+        project_name: newProject.name,
+        price: '12 Tỷ',
+        price_num: 12000000000,
+        location: 'Sơn Trà, Đà Nẵng',
+        area: '150m2',
+        beds: 3,
+        baths: 3,
+        description: 'Căn góc 3 mặt tiền biển. Bàn giao full nội thất liền tường cao cấp.',
+        img_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80',
+        gallery: ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80']
+      },
+      {
+        id: 'prop-real-2',
+        transaction_type: 'rent',
+        property_category: 'villas',
+        is_new: false,
+        name: 'Biệt Thự Vườn Nam Hòa Xuân',
+        project_id: projRes._id,
+        project_name: newProject.name,
+        price: '40 Triệu/tháng',
+        price_num: 40000000,
+        location: 'Cẩm Lệ, Đà Nẵng',
+        area: '250m2',
+        beds: 4,
+        baths: 4,
+        description: 'Khu an ninh 24/7. Phù hợp cho chuyên gia quốc tế.',
+        img_url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80',
+        gallery: ['https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80']
+      }
+    ];
+
+    for (const p of propertiesToSeed) {
+      await supabase.from('properties').upsert(p);
+    }
+    console.log(`✅ Đã tạo ${propertiesToSeed.length} căn hộ bán lẻ.`);
+
+    console.log('🚀 KIỂM TRA ĐẦU CUỐI HOÀN HẢO! CHUỖI LIÊN KẾT ĐÃ THÀNH CÔNG VÀO CẢ 6 BẢNG.');
   } catch (error) {
     console.error('❌ LỖI NGHIÊM TRỌNG: ', error);
   }

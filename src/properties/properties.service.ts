@@ -6,13 +6,13 @@ import { Property } from './models/property.model';
 export class PropertiesService {
   private readonly logger = new Logger(PropertiesService.name);
 
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(private readonly supabaseService: SupabaseService) { }
 
   async findAll(): Promise<Property[]> {
     const supabase = this.supabaseService.getClient();
     const { data, error } = await supabase.from('properties').select('*');
-    
-    // NẾU DATABASE SUPABASE CỦA BẠN TRỐNG DO CHƯA SỬA RLS, TÔI TẠM TRẢ VỀ MOCK DỮ LIỆU ĐỂ HIỂN THỊ GraphQL
+
+    // NẾU DATABASE SUPABASE CỦA BẠN TRỐNG DO CHƯA SỬA  , TÔI TẠM TRẢ VỀ MOCK DỮ LIỆU ĐỂ HIỂN THỊ GraphQL
     if (error || !data || data.length === 0) {
       if (error) this.logger.warn('Supabase DB error: ' + error.message);
       return [
@@ -47,26 +47,10 @@ export class PropertiesService {
           area_num: 300,
           img_url: 'https://images.unsplash.com/photo-1613490908592-fd5e64efebcc?q=80',
           gallery: []
-        },
-        {
-          id: 'gql-mock-3',
-          transaction_type: 'sale',
-          property_category: 'private-houses',
-          is_new: false,
-          name: '[GraphQL] Nhà riêng mặt tiền Cẩm Lệ',
-          price: '4.5 Tỷ',
-          price_num: 4500000000,
-          location: 'Cẩm Lệ, Đà Nẵng',
-          beds: 3,
-          baths: 2,
-          area: '80m2',
-          area_num: 80,
-          img_url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80',
-          gallery: []
         }
       ] as Property[];
     }
-    
+
     return data || [];
   }
 

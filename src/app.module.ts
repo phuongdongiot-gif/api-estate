@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -21,8 +22,9 @@ import { UpstashRedisCache } from './upstash.cache';
       driver: ApolloDriver,
       autoSchemaFile: process.env.VERCEL ? true : join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
-      playground: true, // Hiển thị giao diện Playground
-      introspection: true, // CHo phép Playground tải Schema Docs ở Production
+      playground: false, // Tắt giao diện cũ
+      plugins: [ApolloServerPluginLandingPageLocalDefault()], // Bật giao diện Apollo Sandbox hiện đại cực đẹp
+      introspection: true, // Cho phép Sandbox tải Schema Docs ở Production
       cache: new UpstashRedisCache(), // Thêm dòng này để kết nối Upstash
     }),
     SupabaseModule,

@@ -102,3 +102,10 @@ Cổng giao tiếp mặc định:
 
 > **Lưu ý Cấu trúc Payload (Dữ liệu gửi từ CMS):**
 > Trong các file `*.controller.ts` của NestJS, định dạng bóc tách Payload hiện được code cho tương thích bản đồ JSON bắn từ Sanity (`payload._id`, `payload.title`, v.v.). Nếu tương lai bạn dùng một CMS khác (như WordPress, Ghost, Strapi), hãy vào các thư mục `controller.ts` chỉnh lại key trích xuất (Mapping Payload) cho khớp với CMS mới là xong.
+
+ALTER TABLE public.locations DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.projects DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.project_amenities DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.project_floorplans DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.properties DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.blogs DISABLE ROW LEVEL SECURITY;

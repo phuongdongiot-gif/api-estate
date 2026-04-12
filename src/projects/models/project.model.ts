@@ -1,5 +1,6 @@
 import { Field, ObjectType, Int } from '@nestjs/graphql';
 import { Location } from '../../locations/models/location.model';
+import GraphQLJSON from 'graphql-type-json';
 
 @ObjectType()
 export class ProjectAmenity {
@@ -48,20 +49,17 @@ export class Project {
   @Field()
   name: string;
 
-  @Field({ nullable: true })
-  hero_title?: string;
+  @Field(() => GraphQLJSON, { nullable: true })
+  hero_data?: any;
 
-  @Field({ nullable: true })
-  hero_desc?: string;
+  @Field(() => GraphQLJSON, { nullable: true })
+  overview_data?: any;
 
-  @Field({ nullable: true })
-  hero_img?: string;
+  @Field(() => GraphQLJSON, { nullable: true })
+  values_data?: any;
 
-  @Field({ nullable: true })
-  overview_title?: string;
-
-  @Field({ nullable: true })
-  overview_desc?: string;
+  @Field(() => GraphQLJSON, { nullable: true })
+  location_data?: any;
 
   @Field(() => Number, { nullable: true })
   lat?: number;
