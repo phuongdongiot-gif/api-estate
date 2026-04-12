@@ -12,43 +12,9 @@ export class PropertiesService {
     const supabase = this.supabaseService.getClient();
     const { data, error } = await supabase.from('properties').select('*');
 
-    // NẾU DATABASE SUPABASE CỦA BẠN TRỐNG DO CHƯA SỬA  , TÔI TẠM TRẢ VỀ MOCK DỮ LIỆU ĐỂ HIỂN THỊ GraphQL
-    if (error || !data || data.length === 0) {
-      if (error) this.logger.warn('Supabase DB error: ' + error.message);
-      return [
-        {
-          id: 'gql-mock-1',
-          transaction_type: 'sale',
-          property_category: 'apartments',
-          is_new: true,
-          name: '[GraphQL] Căn hộ góc siêu view biển',
-          price: '8.5 Tỷ',
-          price_num: 8500000000,
-          location: 'Sơn Trà, Đà Nẵng',
-          beds: 3,
-          baths: 2,
-          area: '100m2',
-          area_num: 100,
-          img_url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80',
-          gallery: []
-        },
-        {
-          id: 'gql-mock-2',
-          transaction_type: 'rent',
-          property_category: 'villas',
-          is_new: false,
-          name: '[GraphQL] Biệt thự sinh thái Nam Hòa Xuân',
-          price: '30 Triệu/Tháng',
-          price_num: 30000000,
-          location: 'Hòa Xuân, Đà Nẵng',
-          beds: 5,
-          baths: 6,
-          area: '300m2',
-          area_num: 300,
-          img_url: 'https://images.unsplash.com/photo-1613490908592-fd5e64efebcc?q=80',
-          gallery: []
-        }
-      ] as Property[];
+    if (error) {
+      this.logger.error('Supabase DB error: ' + error.message);
+      return [];
     }
 
     return data || [];
@@ -68,7 +34,7 @@ export class PropertiesService {
     return data || null;
   }
 
-  async upsertProperty(propertyData: any): Promise<any> {
+  async upsertProperty(propertyData: Partial<Property>): Promise<any> {
     const supabase = this.supabaseService.getClient();
     const { data, error } = await supabase
       .from('properties')
@@ -76,6 +42,20 @@ export class PropertiesService {
 
     if (error) {
       this.logger.error('Error upserting property:', error.message);
+      throw new Error(error.message);
+    }
+    return data;
+  }
+
+  async deleteById(id: string): Promise<any> {
+    const supabase = this.supabaseService.getClient();
+    const { data, error } = await supabase
+      .from('properties')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      this.logger.error('Error deleting property:', error.message);
       throw new Error(error.message);
     }
     return data;

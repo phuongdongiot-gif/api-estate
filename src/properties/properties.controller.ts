@@ -11,6 +11,16 @@ export class PropertiesController {
   async handleWebhook(@Body() payload: any) {
     this.logger.log(`Received Sanity webhook for Property: ${payload._id}`);
 
+    if (payload.action === 'delete' || payload.operation === 'delete' || payload.deleted) {
+      try {
+        await this.propertiesService.deleteById(payload._id);
+        this.logger.log('Successfully deleted property from Supabase');
+        return { success: true, deleted: true };
+      } catch (error: any) {
+        return { success: false, error: error.message };
+      }
+    }
+
     // Map Sanity format to Supabase table
     const propertyData = {
       id: payload._id, // Sanity document ID

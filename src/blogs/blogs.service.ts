@@ -31,12 +31,26 @@ export class BlogsService {
     return data || null;
   }
 
-  async upsertBlog(blogData: any): Promise<any> {
+  async upsertBlog(blogData: Partial<Blog>): Promise<any> {
     const supabase = this.supabaseService.getClient();
     const { data, error } = await supabase.from('blogs').upsert(blogData);
 
     if (error) {
       this.logger.error('Error upserting blog:', error.message);
+      throw new Error(error.message);
+    }
+    return data;
+  }
+
+  async deleteById(id: string): Promise<any> {
+    const supabase = this.supabaseService.getClient();
+    const { data, error } = await supabase
+      .from('blogs')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      this.logger.error('Error deleting blog:', error.message);
       throw new Error(error.message);
     }
     return data;

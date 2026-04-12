@@ -71,4 +71,18 @@ export class ProjectsService {
     }
     return data || null;
   }
+
+  async deleteById(id: string): Promise<any> {
+    const supabase = this.supabaseService.getClient();
+    const { data, error } = await supabase
+      .from('projects')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      this.logger.error('Error deleting project:', error.message);
+      throw new Error(error.message);
+    }
+    return data;
+  }
 }

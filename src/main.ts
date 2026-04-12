@@ -21,3 +21,8 @@ export default async function (req: any, res: any) {
   }
   return cachedServer(req, res);
 }
+
+// Chạy cục bộ nếu không phải Vercel Serverless
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  bootstrap();
+}

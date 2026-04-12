@@ -15,6 +15,12 @@ export class ProjectsController {
     if (!payload._id) return { success: false, msg: 'No ID' };
 
     try {
+      if (payload.action === 'delete' || payload.operation === 'delete' || payload.deleted) {
+        await this.projectsService.deleteById(payload._id);
+        this.logger.log('Successfully deleted project from Supabase');
+        return { success: true, deleted: true };
+      }
+
       const sanityClient = createClient({
         projectId: process.env.SANITY_PROJECT_ID || 'missing',
         dataset: process.env.SANITY_DATASET || 'production',

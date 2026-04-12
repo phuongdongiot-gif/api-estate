@@ -3,11 +3,12 @@ import { SupabaseService } from '../supabase/supabase.service';
 import { Location } from './models/location.model';
 import axios from 'axios';
 import { createClient } from '@sanity/client';
+import type { SanityClient } from '@sanity/client';
 
 @Injectable()
 export class LocationsService {
   private readonly logger = new Logger(LocationsService.name);
-  private sanity: any;
+  private sanity: SanityClient | undefined;
 
   constructor(private readonly supabaseService: SupabaseService) {
     if (process.env.SANITY_PROJECT_ID) {
@@ -75,4 +76,32 @@ export class LocationsService {
       return { success: false, error: error.message };
     }
   }
+
+  async upsertLocation(locationData: Partial<Location>): Promise<any> {
+    const supabase = this.supabaseService.getClient();
+    const { data, error } = await supabase
+      .from('locations')
+      .upsert(locationData);
+
+    if (error) {
+      this.logger.error('Error upserting location:', error.message);
+      throw new Error(error.message);
+    }
+    return data;
+  }
+
+  async deleteById(id: string): Promise<any> {
+    const supabase = this.supabaseService.getClient();
+    const { data, error } = await supabase
+      .from('locations')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      this.logger.error('Error deleting location:', error.message);
+      throw new Error(error.message);
+    }
+    return data;
+  }
 }
+
