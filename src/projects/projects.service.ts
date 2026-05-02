@@ -1,19 +1,27 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { SupabaseService } from '../supabase/supabase.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ProjectEntity } from '../database/entities/project.entity';
+import { ProjectAmenityEntity } from '../database/entities/project-amenity.entity';
+import { ProjectFloorplanEntity } from '../database/entities/project-floorplan.entity';
 
 @Injectable()
 export class ProjectsService {
   private readonly logger = new Logger(ProjectsService.name);
 
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(
+    @InjectRepository(ProjectEntity)
+    private readonly projectRepo: Repository<ProjectEntity>,
+    @InjectRepository(ProjectAmenityEntity)
+    private readonly amenityRepo: Repository<ProjectAmenityEntity>,
+    @InjectRepository(ProjectFloorplanEntity)
+    private readonly floorplanRepo: Repository<ProjectFloorplanEntity>,
+  ) {}
 
   async upsertCompleteProject(projectPayload: any, amenities: any[], floorplans: any[]): Promise<any> {
-    const supabase = this.supabaseService.getClient();
-
     try {
       // 1. Upsert Project
-      const { error: projErr } = await supabase.from('projects').upsert(projectPayload);
-      if (projErr) throw new Error('Crashed at Projects: ' + projErr.message);
+      await this.projectRepo.upsert(projectPayload, ['id']);
 
       // 2. Upsert Amenities
       for (const amen of amenities) {
@@ -23,7 +31,7 @@ export class ProjectsService {
           title: amen.title,
           description: amen.description,
         };
-        await supabase.from('project_amenities').upsert(amenData);
+        await this.amenityRepo.upsert(amenData, ['id']);
       }
 
       // 3. Upsert Floorplans
@@ -36,7 +44,7 @@ export class ProjectsService {
           beds: fp.beds,
           baths: fp.baths,
         };
-        await supabase.from('project_floorplans').upsert(fpData);
+        await this.floorplanRepo.upsert(fpData, ['id']);
       }
 
       return { success: true };
@@ -47,42 +55,30 @@ export class ProjectsService {
   }
 
   async findAll(): Promise<any[]> {
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase
-      .from('projects')
-      .select('*, location:locations(*), amenities:project_amenities(*), floorplans:project_floorplans(*)');
-    if (error) {
+    try {
+      return await this.projectRepo.find({
+        relations: ['location', 'amenities', 'floorplans'],
+      });
+    } catch (error: any) {
       this.logger.error('Error fetching projects:', error.message);
       return [];
     }
-    return data || [];
   }
 
   async findBySlug(slug: string): Promise<any | null> {
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase
-      .from('projects')
-      .select('*, location:locations(*), amenities:project_amenities(*), floorplans:project_floorplans(*)')
-      .eq('slug', slug)
-      .single();
-
-    if (error && error.code !== 'PGRST116') {
-      throw new Error(error.message);
-    }
-    return data || null;
+    return await this.projectRepo.findOne({
+      where: { slug },
+      relations: ['location', 'amenities', 'floorplans'],
+    });
   }
 
   async deleteById(id: string): Promise<any> {
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase
-      .from('projects')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
+    try {
+      const result = await this.projectRepo.delete(id);
+      return result;
+    } catch (error: any) {
       this.logger.error('Error deleting project:', error.message);
       throw new Error(error.message);
     }
-    return data;
   }
 }

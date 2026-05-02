@@ -1,63 +1,50 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { SupabaseService } from '../supabase/supabase.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { PropertyEntity } from '../database/entities/property.entity';
 import { Property } from './models/property.model';
 
 @Injectable()
 export class PropertiesService {
   private readonly logger = new Logger(PropertiesService.name);
 
-  constructor(private readonly supabaseService: SupabaseService) { }
+  constructor(
+    @InjectRepository(PropertyEntity)
+    private readonly propertyRepo: Repository<PropertyEntity>,
+  ) {}
 
   async findAll(): Promise<Property[]> {
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase.from('properties').select('*');
-
-    if (error) {
-      this.logger.error('Supabase DB error: ' + error.message);
+    try {
+      return await this.propertyRepo.find({
+        order: { created_at: 'DESC' },
+      });
+    } catch (error: any) {
+      this.logger.error('DB error: ' + error.message);
       return [];
     }
-
-    return data || [];
   }
 
   async findById(id: string): Promise<Property | null> {
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase
-      .from('properties')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error && error.code !== 'PGRST116') {
-      throw new Error(error.message);
-    }
-    return data || null;
+    return await this.propertyRepo.findOneBy({ id });
   }
 
-  async upsertProperty(propertyData: Partial<Property>): Promise<any> {
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase
-      .from('properties')
-      .upsert(propertyData);
-
-    if (error) {
+  async upsertProperty(propertyData: Partial<PropertyEntity>): Promise<any> {
+    try {
+      await this.propertyRepo.upsert(propertyData, ['id']);
+      return propertyData;
+    } catch (error: any) {
       this.logger.error('Error upserting property:', error.message);
       throw new Error(error.message);
     }
-    return data;
   }
 
   async deleteById(id: string): Promise<any> {
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase
-      .from('properties')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
+    try {
+      const result = await this.propertyRepo.delete(id);
+      return result;
+    } catch (error: any) {
       this.logger.error('Error deleting property:', error.message);
       throw new Error(error.message);
     }
-    return data;
   }
 }

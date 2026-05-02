@@ -49,6 +49,12 @@ export class Project {
   @Field()
   name: string;
 
+  @Field({ nullable: true })
+  hero_title?: string;
+
+  @Field({ nullable: true })
+  hero_desc?: string;
+
   @Field(() => GraphQLJSON, { nullable: true })
   hero_data?: any;
 

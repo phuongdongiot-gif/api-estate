@@ -1,58 +1,45 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { SupabaseService } from '../supabase/supabase.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { BlogEntity } from '../database/entities/blog.entity';
 import { Blog } from './models/blog.model';
 
 @Injectable()
 export class BlogsService {
   private readonly logger = new Logger(BlogsService.name);
 
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(
+    @InjectRepository(BlogEntity)
+    private readonly blogRepo: Repository<BlogEntity>,
+  ) {}
 
   async findAll(): Promise<Blog[]> {
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase.from('blogs').select('*');
-    if (error) {
-      throw new Error(error.message);
-    }
-    return data || [];
+    return await this.blogRepo.find({
+      order: { date: 'DESC' },
+    });
   }
 
   async findBySlug(slug: string): Promise<Blog | null> {
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase
-      .from('blogs')
-      .select('*')
-      .eq('slug', slug)
-      .single();
-
-    if (error && error.code !== 'PGRST116') {
-      throw new Error(error.message);
-    }
-    return data || null;
+    return await this.blogRepo.findOneBy({ slug });
   }
 
-  async upsertBlog(blogData: Partial<Blog>): Promise<any> {
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase.from('blogs').upsert(blogData);
-
-    if (error) {
+  async upsertBlog(blogData: Partial<BlogEntity>): Promise<any> {
+    try {
+      await this.blogRepo.upsert(blogData, ['id']);
+      return blogData;
+    } catch (error: any) {
       this.logger.error('Error upserting blog:', error.message);
       throw new Error(error.message);
     }
-    return data;
   }
 
   async deleteById(id: string): Promise<any> {
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase
-      .from('blogs')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
+    try {
+      const result = await this.blogRepo.delete(id);
+      return result;
+    } catch (error: any) {
       this.logger.error('Error deleting blog:', error.message);
       throw new Error(error.message);
     }
-    return data;
   }
 }

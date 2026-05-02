@@ -35,6 +35,8 @@ type Project {
   amenities: [ProjectAmenity!]
   floorplans: [ProjectFloorplan!]
   hero_data: JSON
+  hero_desc: String
+  hero_title: String
   id: String!
   lat: Float
   lng: Float
@@ -63,21 +65,38 @@ type ProjectFloorplan {
 }
 
 type Property {
+  agent_avatar: String
+  agent_name: String
+  agent_phone: String
+  agent_zalo: String
   area: String
   area_num: Float
+  balcony_direction: String
   baths: Int
   beds: Int
   description: String
+  entrance_width: Float
+  floors: Int
+  frontage: Float
+  furniture: String
   gallery: [String!]
+  house_direction: String
   id: String!
   img_url: String
   is_new: Boolean
+  lat: Float
+  legal_status: String
+  lng: Float
   location: String
   name: String!
   price: String
   price_num: Float
+  project_id: String
+  project_name: String
   property_category: String
+  tour_3d_url: String
   transaction_type: String
+  video_url: String
 }
 
 type Query {

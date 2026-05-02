@@ -6,7 +6,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { SupabaseModule } from './supabase/supabase.module';
+import { DatabaseModule } from './database/database.module';
 import { PropertiesModule } from './properties/properties.module';
 import { BlogsModule } from './blogs/blogs.module';
 import { ProjectsModule } from './projects/projects.module';
@@ -27,7 +27,7 @@ import { UpstashRedisCache } from './upstash.cache';
       introspection: true, // Cho phép Sandbox tải Schema Docs ở Production
       cache: new UpstashRedisCache(), // Thêm dòng này để kết nối Upstash
     }),
-    SupabaseModule,
+    DatabaseModule,
     PropertiesModule,
     BlogsModule,
     ProjectsModule,
@@ -38,4 +38,3 @@ import { UpstashRedisCache } from './upstash.cache';
   providers: [AppService],
 })
 export class AppModule {}
-
