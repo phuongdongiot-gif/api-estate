@@ -125,16 +125,6 @@ async function seed() {
         video_url: 'https://youtube.com',
         tour_3d_url: 'https://my.matterport.com/show/?m=xxx',
         lat: 16.0359, lng: 108.2438
-      },
-      {
-        id: 'prop-phuquoc-1', transaction_type: 'sale', property_category: 'villas', is_new: false,
-        name: 'Ocean Front Villa Sun Premier', project_id: null, project_name: null,
-        price: '120 Tỷ', price_num: 120000000000, location: 'Nam Đảo, Phú Quốc',
-        area: '800m2', area_num: 800, beds: 6, baths: 7,
-        description: 'Biệt thự mũi Ông Đội, 2 mặt biển hiếm có tại Việt Nam. Bến du thuyền cá nhân.',
-        img_url: 'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?q=80&w=2000',
-        gallery: ['https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?q=80&w=2000'],
-        lat: 10.2289, lng: 103.9572
       }
     ];
     for (const p of properties) await propertyRepo.save(p);

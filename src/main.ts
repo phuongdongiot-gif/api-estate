@@ -10,7 +10,7 @@ async function bootstrap() {
     return app.getHttpAdapter().getInstance();
   }
   
-  await app.listen(process.env.PORT ?? 3001);
+  await app.listen(process.env.PORT ?? 3001, '0.0.0.0');
 }
 
 // Hàm Wrapper đặc biệt cho môi trường Serverless của Vercel
@@ -22,7 +22,7 @@ export default async function (req: any, res: any) {
   return cachedServer(req, res);
 }
 
-// Chạy cục bộ nếu không phải Vercel Serverless
-if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+// Chạy cục bộ hoặc chạy trên Container/Server (Railway, Render, VPS)
+if (!process.env.VERCEL) {
   bootstrap();
 }
